@@ -1,0 +1,142 @@
+Script started on Wed Nov  8 18:48:48 2017
+% cat hw11.c -n
+     1	/*
+     2	 * File: hw11.c
+     3	 * Project: CS 125 Assignment 11
+     4	 * Purpose: Create structs to define a polygon and its perimeter
+     5	 * Author: Joshua Paul Rodriguez
+     6	 * Version: 1.0 November 7, 2017
+     7	 *          1.1 November 8, 2017 added variable polygon support
+     8	 */
+     9	#include <stdio.h> /* for printf */
+    10	#include <stdlib.h> /* for RAND_MAX */
+    11	#include <math.h> /* for sqrt() */
+    12	#define MAX_LEN 64 /* max array length */
+    13	
+    14	/* a pair of doubles */
+    15	typedef struct {
+    16	    double x;
+    17	    double y;
+    18	} Point;
+    19	
+    20	/* a triple of points in an array */
+    21	typedef struct {
+    22	    Point vertex[MAX_LEN];
+    23	    int numOfVertex;
+    24	} Polygon;
+    25	
+    26	/* prompts and reprompts for a number */
+    27	int enterNumOfVertex(void);
+    28	/* prompts and reprompts for a coord */
+    29	Point enterPoint(void);
+    30	/* calculates and returns a coord of the perimeter of a given polygon */
+    31	double perimeter(const Polygon* pol);
+    32	/* calculates and returns the distance between 2 given points */
+    33	double distanceBetweenPoints(const Point* p1, const Point* p2);
+    34	/* prints the verticies and verbaige to console */
+    35	void printVertices(const Polygon* pol);
+    36	
+    37	int main(void) {
+    38	    int i;
+    39	    Polygon poly;
+    40	    double perim;
+    41	
+    42	    poly.numOfVertex = enterNumOfVertex();
+    43	    /* for each vertex of the polygon, store a point */
+    44	    for (i = 0; i < poly.numOfVertex; i++) {
+    45	        poly.vertex[i] = enterPoint();
+    46	    }
+    47	    perim = perimeter(&poly);
+    48	    printVertices(&poly);
+    49	    printf("The perimeter is %.2f\n", perim);
+    50	    return 0;
+    51	}
+    52	
+    53	/* prompts and reprompts for a valid number */
+    54	int enterNumOfVertex(void) {
+    55	    int number;
+    56	    printf("Enter the number of vertices: ");
+    57	    /* runs the loop as long as the user has not entered a valid num */
+    58	    /* then reprompts the user */
+    59	    while (scanf("%d", &number) != 1) {
+    60	        scanf("%*[^\n]");
+    61	        printf("Integer could not be read. Try again.\n");
+    62	        printf("Enter the number of vertices: ");
+    63	    }
+    64	    return number;
+    65	}
+    66	
+    67	/* prompts and reprompts for a valid coord */
+    68	Point enterPoint(void) {
+    69	    Point punkt;
+    70	    printf("Enter the x and y coordinates separated by a comma: ");
+    71	    /* runs the loop as long as the user has not entered valid nums */
+    72	    /* then reprompts the user */
+    73	    while (scanf("%lf,%lf", &punkt.x, &punkt.y) != 2) {
+    74	        scanf("%*[^\n]");
+    75	        printf("Coordinates could not be read. Try again.\n");
+    76	        printf("Enter the x and y coordinates separated by a comma: ");
+    77	    }
+    78	    return punkt;
+    79	}
+    80	
+    81	/* calculates and returns a coord of the perimeter of a given polygon */
+    82	double perimeter(const Polygon* pol) {
+    83	    double perimeter = 0.0;
+    84	    int i;
+    85	    /* iterates though the different edges of the polygon except the last */
+    86	    /* assuming that 2 consecuative points are connected by an edge */
+    87	    for (i = 0; i < pol->numOfVertex - 1; i++)
+    88	        perimeter += distanceBetweenPoints(&pol->vertex[i], &pol->vertex[i+1]);
+    89	    /* last edge has to go from the last point to the first point */
+    90	    perimeter += distanceBetweenPoints(&pol->vertex[i], &pol->vertex[0]);
+    91	    return perimeter; 
+    92	}
+    93	
+    94	/* calculates and returns the distance between 2 given points */
+    95	double distanceBetweenPoints(const Point* p1, const Point* p2) {
+    96	    double xDiff = p1->x - p2->x;
+    97	    double yDiff = p1->y - p2->y;
+    98	    double distance = sqrt((xDiff * xDiff) + (yDiff * yDiff));
+    99	    return distance;
+   100	}
+   101	
+   102	/* prints the verticies and verbaige to console */
+   103	void printVertices(const Polygon* pol) {
+   104	    int i;
+   105	    printf("The point coordinates are: ");
+   106	    /* iterates though the vertecies */
+   107	    for (i = 0; i < pol->numOfVertex - 1; i++)
+   108	            printf("[%.2f,%.2f],", pol->vertex[i].x, pol->vertex[i].y);
+   109	    /* prints values and newline for the last vertex */
+   110	    printf("[%.2f,%.2f]\n", pol->vertex[i].x, pol->vertex[i].y);
+   111	}% 
+[K% gcc hw11.c -lm
+% a.out
+Enter the number of vertices: 3
+Enter the x and y coordinates separated by a comma: 0,0
+Enter the x and y coordinates separated by a comma: 3,09 
+Enter the x and y coordinates separated by a comma: 3,4
+The point coordinates are: [0.00,0.00],[3.00,0.00],[3.00,4.00]
+The perimeter is 12.00
+% a.out
+Enter the number of vertices: 3
+Enter the x and y coordinates separated by a comma: 12.57,16.8
+Enter the x and y coordinates separated by a comma: 3.2,-5.4
+Enter the x and y coordinates separated by a comma: 8.15,x
+Coordinates could not be read. Try again.
+Enter the x and y coordinates separated by a comma: 8.15,6
+The point coordinates are: [12.57,16.80],[3.20,-5.40],[8.15,6.00]
+The perimeter is 48.19
+% a.out
+Enter the number of vertices: 3 4
+Enter the x and y coordinates separated by a comma: 00 . ,0
+Enter the x and y coordinates separated by a comma: 0,3
+Enter the x and y coordinates separated by a comma: 4,3
+Enter the x and y coordinates separated by a comma: 3,0   4,0
+The point coordinates are: [0.00,0.00],[0.00,3.00],[4.00,3.00],[4.00,0.00]
+The perimeter is 14.00
+% exit
+exit
+
+Script done on Wed Nov  8 18:51:35 2017
